@@ -1,9 +1,19 @@
 * module-org-capture
 
   Capture notes in org-mode from the Evolution personal information
-  management application.
+  management application. Please note that this extension is
+  experimental and that it does not yet work.
 
 ** Installation
+
+   First install the dependencies, for example, on Fedora:
+
+   #+BEGIN_SRC sh
+   dnf install evolution-devel
+   dnf install evolution-data-server-devel
+   #+END_SRC
+
+   Then clone and build the =module-org-capture= extension:
 
    #+BEGIN_SRC sh
    git clone https://github.com/stewid/module-org-capture.git
