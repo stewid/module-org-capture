@@ -1,4 +1,4 @@
-* org-capture-module
+* module-org-capture
 
   Capture notes in org-mode from the Evolution personal information
   management application.
@@ -6,8 +6,8 @@
 ** Installation
 
    #+BEGIN_SRC sh
-   git clone https://github.com/stewid/org-capture-module.git
-   cd org-capture-module
+   git clone https://github.com/stewid/module-org-capture.git
+   cd module-org-capture
    mkdir _build
    cd _build
    cmake -G "Unix Makefiles" ..
@@ -17,4 +17,4 @@
 
 ** License
 
-  The =org-capture-module= extension is licensed under the [[https://github.com/stewid/org-capture-module/blob/master/LICENSE][GPLv3]].
+  The =module-org-capture= extension is licensed under the [[https://github.com/stewid/org-capture-module/blob/master/LICENSE][GPLv3]].
