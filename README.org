@@ -1,2 +1,9 @@
-# org-capture-module
-Capture notes in org-mode from the Evolution personal information management application
+* org-capture-module
+
+  Capture notes in org-mode from the Evolution personal information
+  management application.
+
+* License
+
+  The `org-capture-module` extension is licensed under the
+  [GPLv3](https://github.com/stewid/org-capture-module/blob/master/LICENSE).
