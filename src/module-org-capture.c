@@ -138,6 +138,89 @@ org_capture_enable_actions (GtkActionGroup		*action_group,
 }
 
 static void
+org_capture_update_actions_cb (EShellView     *shell_view,
+			       GtkActionEntry *entries)
+{
+	EShellContent	*shell_content = NULL;
+	EShellWindow	*shell_window  = NULL;
+	EMailView	*mail_view     = NULL;
+	GtkActionGroup	*action_group  = NULL;
+	GtkUIManager	*ui_manager    = NULL;
+
+	g_return_if_fail (E_IS_SHELL_VIEW (shell_view));
+
+	shell_content = e_shell_view_get_shell_content (shell_view);
+	g_object_get (shell_content, "mail-view", &mail_view, NULL);
+	shell_window = e_shell_view_get_shell_window (shell_view);
+	ui_manager   = e_shell_window_get_ui_manager (shell_window);
+	action_group = e_lookup_action_group (ui_manager, "mail");
+
+	org_capture_enable_actions (action_group,
+				    org_menu_entries,
+				    G_N_ELEMENTS (org_menu_entries),
+				    org_capture_has_message(mail_view));
+}
+
+void
+org_capture_ui_init (GtkUIManager	 *ui_manager,
+		     EShellView		 *shell_view,
+		     gchar		**ui_definition)
+{
+	const gchar *ui_def =
+		"<menubar name='main-menu'>\n"
+		"  <placeholder name='custom-menus'>\n"
+		"    <menu action='mail-message-menu'>\n"
+		"      <placeholder name='mail-message-custom-menus'>\n"
+		"        <menuitem action=\"org-capture-mail-message\"/>\n"
+		"      </placeholder>\n"
+		"    </menu>\n"
+		"  </placeholder>\n"
+                "</menubar>\n";
+
+	EShellWindow *shell_window;
+	GtkActionGroup *action_group;
+
+	g_return_if_fail (ui_definition != NULL);
+
+	*ui_definition = g_strdup (ui_def);
+
+	shell_window = e_shell_view_get_shell_window (shell_view);
+	action_group = e_shell_window_get_action_group (shell_window, "mail");
+
+	e_action_group_add_actions_localized (
+		action_group,
+		GETTEXT_PACKAGE,
+		org_menu_entries,
+		G_N_ELEMENTS (org_menu_entries),
+		shell_view);
+
+	g_signal_connect (
+		shell_view,
+		"update-actions",
+		G_CALLBACK (org_capture_update_actions_cb),
+		shell_view);
+}
+
+static void
+org_capture_ui_definition (EShellView	 *shell_view,
+			   const gchar	 *ui_manager_id,
+			   gchar	**ui_definition)
+{
+	EShellWindow *shell_window;
+	GtkUIManager *ui_manager;
+
+	g_return_if_fail (shell_view != NULL);
+	g_return_if_fail (ui_manager_id != NULL);
+	g_return_if_fail (ui_definition != NULL);
+
+	shell_window = e_shell_view_get_shell_window (shell_view);
+	ui_manager = e_shell_window_get_ui_manager (shell_window);
+
+	if (g_strcmp0 (ui_manager_id, "org.gnome.evolution.mail") == 0)
+		org_capture_ui_init (ui_manager, shell_view, ui_definition);
+}
+
+static void
 e_org_capture_constructed (GObject *object)
 {
         EExtensible *extensible;
