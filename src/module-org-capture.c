@@ -20,7 +20,6 @@
 
 #include <shell/e-shell.h>
 #include <shell/e-shell-view.h>
-#include <libebackend/libebackend.h>
 #include <glib/gi18n-lib.h>
 #include <mail/e-mail-reader.h>
 #include <mail/e-mail-paned-view.h>
