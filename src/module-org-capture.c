@@ -41,6 +41,15 @@ GType e_org_capture_get_type (void);
 
 G_DEFINE_DYNAMIC_TYPE (EOrgCapture, e_org_capture, E_TYPE_EXTENSION)
 
+static GtkActionEntry org_menu_entries[] = {
+	{ "org-capture-mail-message",
+	  NULL,
+	  N_("Org capture message"),
+	  "<Primary><Alt>c",
+	  N_("Org capture message"),
+	  G_CALLBACK (org_capture_mail_message_cb) }
+};
+
 static void
 e_org_capture_constructed (GObject *object)
 {
