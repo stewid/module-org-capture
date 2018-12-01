@@ -51,6 +51,49 @@ static GtkActionEntry org_menu_entries[] = {
 };
 
 static void
+org_capture_mail_message_cb (GtkAction	*action,
+			     EShellView	*shell_view)
+{
+	EShellContent	*shell_content;
+	EMailView	*mail_view     = NULL;
+	GPtrArray	*selected_uids = NULL;
+
+	g_return_if_fail (E_IS_SHELL_VIEW (shell_view));
+
+	shell_content = e_shell_view_get_shell_content (shell_view);
+	g_object_get (shell_content, "mail-view", &mail_view, NULL);
+	if (E_IS_MAIL_PANED_VIEW (mail_view)) {
+		EMailReader *reader = E_MAIL_READER (mail_view);
+
+		selected_uids = e_mail_reader_get_selected_uids (reader);
+		if (selected_uids) {
+			if (selected_uids->len == 1) {
+				CamelMessageInfo	*info;
+				CamelFolder		*folder;
+				const gchar		*uid;
+				const gchar		*title;
+
+				folder = e_mail_reader_ref_folder (reader);
+				uid    = g_ptr_array_index (selected_uids, 0);
+				info   = camel_folder_get_message_info (folder, uid);
+
+				title = camel_message_info_get_subject (info);
+				if (title == NULL || *title == '\0')
+					title = _("(No Subject)");
+
+				/* FIXME: Start the emacsclient and org-capture */
+				g_print ("   %s: %s\n", uid, title);
+
+				g_clear_object (&info);
+				g_clear_object (&folder);
+			}
+
+			g_ptr_array_unref (selected_uids);
+		}
+	}
+}
+
+static void
 e_org_capture_constructed (GObject *object)
 {
         EExtensible *extensible;
