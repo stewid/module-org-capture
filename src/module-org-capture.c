@@ -100,6 +100,21 @@ org_capture_mail_message_cb (GtkAction	*action,
 	}
 }
 
+static gboolean
+org_capture_has_message(EMailView *mail_view)
+{
+	EMailReader	*reader	      = NULL;
+	MessageList	*message_list = NULL;
+
+	if (!E_IS_MAIL_PANED_VIEW (mail_view))
+		return FALSE;
+
+	reader	     = E_MAIL_READER (mail_view);
+	message_list = MESSAGE_LIST (e_mail_reader_get_message_list (reader));
+
+	return message_list_selected_count (message_list) == 1 ? TRUE : FALSE;
+}
+
 static void
 e_org_capture_constructed (GObject *object)
 {
