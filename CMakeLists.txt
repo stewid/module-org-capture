@@ -33,9 +33,7 @@ function(pkg_check_variable _output_name _pkg _name)
 endfunction()
 
 pkg_check_modules(EVOLUTION_SHELL REQUIRED evolution-shell-3.0>=${REQUIRE_EVOLUTION_VERSION})
-pkg_check_modules(EVOLUTION_CALENDAR REQUIRED evolution-calendar-3.0>=${REQUIRE_EVOLUTION_VERSION})
 pkg_check_modules(EVOLUTION_MAIL REQUIRED evolution-mail-3.0>=${REQUIRE_EVOLUTION_VERSION})
-pkg_check_modules(LIBECAL REQUIRED libecal-1.2>=${REQUIRE_EVOLUTION_VERSION})
 
 pkg_check_variable(EVOLUTION_MODULE_DIR evolution-shell-3.0 moduledir)
 
