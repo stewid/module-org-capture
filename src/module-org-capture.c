@@ -19,7 +19,11 @@
  */
 
 #include <shell/e-shell.h>
+#include <shell/e-shell-view.h>
 #include <libebackend/libebackend.h>
+#include <glib/gi18n-lib.h>
+#include <mail/e-mail-reader.h>
+#include <mail/e-mail-paned-view.h>
 
 typedef struct _EOrgCapture EOrgCapture;
 typedef struct _EOrgCaptureClass EOrgCaptureClass;
@@ -40,6 +44,10 @@ void e_module_unload (GTypeModule *type_module);
 GType e_org_capture_get_type (void);
 
 G_DEFINE_DYNAMIC_TYPE (EOrgCapture, e_org_capture, E_TYPE_EXTENSION)
+
+static void
+org_capture_mail_message_cb (GtkAction	*action,
+			     EShellView	*shell_view);
 
 static GtkActionEntry org_menu_entries[] = {
 	{ "org-capture-mail-message",
