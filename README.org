@@ -1,8 +1,8 @@
 * module-org-capture
 
   Capture notes in org-mode from the Evolution personal information
-  management application. Please note that this extension is in early
-  experimental development and that it does not yet work.
+  management application. Please note that this extension is in an
+  early experimental development phase and that it does not yet work.
 
 ** Installation
 
