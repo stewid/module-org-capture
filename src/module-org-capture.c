@@ -25,15 +25,32 @@
 #include <mail/e-mail-paned-view.h>
 #include <mail/message-list.h>
 
+/* Standard GObject macros */
+#define E_ORG_CAPTURE_TYPE \
+	(e_org_capture_get_type ())
+#define E_ORG_CAPTURE(obj) \
+	(G_TYPE_CHECK_INSTANCE_CAST \
+	((obj), E_ORG_CAPTURE_TYPE, EOrgCapture))
+#define E_IS_ORG_CAPTURE(obj)		\
+	(G_TYPE_CHECK_INSTANCE_TYPE \
+	((obj), E_ORG_CAPTURE_TYPE))
+
 typedef struct _EOrgCapture EOrgCapture;
 typedef struct _EOrgCaptureClass EOrgCaptureClass;
+typedef struct _EOrgCapturePrivate EOrgCapturePrivate;
 
 struct _EOrgCapture {
         EExtension parent;
+	EOrgCapturePrivate *priv;
 };
 
 struct _EOrgCaptureClass {
         EExtensionClass parent_class;
+};
+
+struct _EOrgCapturePrivate {
+	guint current_ui_id;
+	GHashTable *ui_definitions;
 };
 
 /* Module Entry Points */
@@ -267,6 +284,16 @@ e_org_capture_init (EOrgCapture *extension)
 {
         /* The EShell object we're extending is not available yet,
          * but we could still do some early initialization here. */
+	extension->priv = G_TYPE_INSTANCE_GET_PRIVATE (
+		extension,
+		E_ORG_CAPTURE_TYPE,
+		EOrgCapturePrivate);
+	extension->priv->current_ui_id = 0;
+	extension->priv->ui_definitions = g_hash_table_new_full (
+		g_str_hash,
+		g_str_equal,
+		g_free,
+		g_free);
 }
 
 G_MODULE_EXPORT void
