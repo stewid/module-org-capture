@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 #include <mail/e-mail-reader.h>
 #include <mail/e-mail-paned-view.h>
+#include <mail/message-list.h>
 
 typedef struct _EOrgCapture EOrgCapture;
 typedef struct _EOrgCaptureClass EOrgCaptureClass;
