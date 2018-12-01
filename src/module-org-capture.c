@@ -116,6 +116,27 @@ org_capture_has_message(EMailView *mail_view)
 }
 
 static void
+org_capture_enable_actions (GtkActionGroup		*action_group,
+			    const GtkActionEntry	*entries,
+			    guint			 n_entries,
+			    gboolean			 enable)
+{
+	gint i;
+
+	g_return_if_fail (action_group != NULL);
+	g_return_if_fail (entries != NULL);
+
+	for (i = 0; i < n_entries; i++) {
+		GtkAction *action;
+
+		action = gtk_action_group_get_action (action_group,
+						      entries[i].name);
+		if (action)
+			gtk_action_set_sensitive (action, enable);
+	}
+}
+
+static void
 e_org_capture_constructed (GObject *object)
 {
         EExtensible *extensible;
