@@ -41,7 +41,7 @@ typedef struct _EOrgCapturePrivate EOrgCapturePrivate;
 
 struct _EOrgCapture {
         EExtension parent;
-	EOrgCapturePrivate *priv;
+	EOrgCapturePrivate *private;
 };
 
 struct _EOrgCaptureClass {
@@ -107,6 +107,7 @@ org_capture_mail_message_cb (GtkAction	*action,
 					title = _("(No Subject)");
 
 				/* FIXME: Start the emacsclient and org-capture */
+				/* system("emacsclient -a '' -c -F '(quote (name . \"capture\"))' -e '(activate-capture-frame)'"); */
 				g_print ("   %s: %s\n", uid, title);
 
 				g_clear_object (&info);
@@ -147,8 +148,9 @@ org_capture_enable_actions (GtkActionGroup		*action_group,
 	for (i = 0; i < n_entries; i++) {
 		GtkAction *action;
 
-		action = gtk_action_group_get_action (action_group,
-						      entries[i].name);
+		action = gtk_action_group_get_action (
+			action_group,
+			entries[i].name);
 		if (action)
 			gtk_action_set_sensitive (action, enable);
 	}
@@ -172,10 +174,11 @@ org_capture_update_actions_cb (EShellView     *shell_view,
 	ui_manager   = e_shell_window_get_ui_manager (shell_window);
 	action_group = e_lookup_action_group (ui_manager, "mail");
 
-	org_capture_enable_actions (action_group,
-				    org_menu_entries,
-				    G_N_ELEMENTS (org_menu_entries),
-				    org_capture_has_message(mail_view));
+	org_capture_enable_actions (
+		action_group,
+		org_menu_entries,
+		G_N_ELEMENTS (org_menu_entries),
+		org_capture_has_message(mail_view));
 }
 
 void
@@ -238,21 +241,96 @@ org_capture_ui_definition (EShellView	 *shell_view,
 }
 
 static void
+e_org_capture_toggled_cb (EShellView	*shell_view,
+			  EOrgCapture	*org_capture)
+{
+	EShellViewClass *shell_view_class;
+	EShellWindow *shell_window;
+	GtkUIManager *ui_manager;
+	gpointer key = NULL, value = NULL;
+	const gchar *ui_def;
+	gboolean is_active, need_update;
+
+	g_return_if_fail (E_IS_SHELL_VIEW (shell_view));
+	g_return_if_fail (E_IS_ORG_CAPTURE (org_capture));
+
+	shell_view_class = E_SHELL_VIEW_GET_CLASS (shell_view);
+	g_return_if_fail (shell_view_class != NULL);
+
+	shell_window = e_shell_view_get_shell_window (shell_view);
+	ui_manager = e_shell_window_get_ui_manager (shell_window);
+
+	need_update = org_capture->private->current_ui_id != 0;
+	if (org_capture->private->current_ui_id) {
+		gtk_ui_manager_remove_ui (ui_manager, org_capture->private->current_ui_id);
+		org_capture->private->current_ui_id = 0;
+	}
+
+	is_active = e_shell_view_is_active (shell_view);
+	if (!is_active) {
+		if (need_update)
+			gtk_ui_manager_ensure_update (ui_manager);
+
+		return;
+	}
+
+	if (!g_hash_table_lookup_extended (org_capture->private->ui_definitions, shell_view_class->ui_manager_id, &key, &value)) {
+		gchar *ui_definition = NULL;
+
+		org_capture_ui_definition (
+			shell_view,
+			shell_view_class->ui_manager_id,
+			&ui_definition);
+		g_hash_table_insert (
+			org_capture->private->ui_definitions,
+			g_strdup (shell_view_class->ui_manager_id),
+			ui_definition);
+	}
+
+	ui_def = g_hash_table_lookup (
+		org_capture->private->ui_definitions,
+		shell_view_class->ui_manager_id);
+	if (ui_def) {
+		GError *error = NULL;
+
+		org_capture->private->current_ui_id = gtk_ui_manager_add_ui_from_string (
+			ui_manager,
+			ui_def,
+			-1, &error);
+		need_update = TRUE;
+
+		if (error) {
+			g_warning ("%s: Failed to add ui definition: %s", G_STRFUNC, error->message);
+			g_error_free (error);
+		}
+	}
+
+	if (need_update)
+		gtk_ui_manager_ensure_update (ui_manager);
+}
+
+static void
 e_org_capture_constructed (GObject *object)
 {
-        EExtensible *extensible;
+	EExtension *extension;
+	EExtensible *extensible;
 
-        /* This retrieves the EShell instance we're extending. */
-        extensible = e_extension_get_extensible (E_EXTENSION (object));
+	extension = E_EXTENSION (object);
+	extensible = e_extension_get_extensible (extension);
 
-        g_print ("Initialize 'module-org-capture' from %s.\n", G_OBJECT_TYPE_NAME (extensible));
+	/* Chain up to parent's constructed() method. */
+	G_OBJECT_CLASS (e_org_capture_parent_class)->constructed (object);
+
+	g_signal_connect (
+		object,
+		"toggled",
+		G_CALLBACK (e_org_capture_toggled_cb),
+		extension);
 }
 
 static void
 e_org_capture_finalize (GObject *object)
 {
-        g_print ("Finalize 'module-org-capture'.\n");
-
         /* Chain up to parent's finalize() method. */
         G_OBJECT_CLASS (e_org_capture_parent_class)->finalize (object);
 }
@@ -284,12 +362,12 @@ e_org_capture_init (EOrgCapture *extension)
 {
         /* The EShell object we're extending is not available yet,
          * but we could still do some early initialization here. */
-	extension->priv = G_TYPE_INSTANCE_GET_PRIVATE (
+	extension->private = G_TYPE_INSTANCE_GET_PRIVATE (
 		extension,
 		E_ORG_CAPTURE_TYPE,
 		EOrgCapturePrivate);
-	extension->priv->current_ui_id = 0;
-	extension->priv->ui_definitions = g_hash_table_new_full (
+	extension->private->current_ui_id = 0;
+	extension->private->ui_definitions = g_hash_table_new_full (
 		g_str_hash,
 		g_str_equal,
 		g_free,
