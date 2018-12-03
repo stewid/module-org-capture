@@ -61,6 +61,13 @@ struct _EOrgCapturePrivate {
 G_DEFINE_DYNAMIC_TYPE (EOrgCapture, e_org_capture, E_TYPE_EXTENSION)
 
 static void
+org_capture_run_emacsclient(const gchar	*uid;
+			    const gchar	*title)
+{
+	system("emacsclient -a '' -c -F '(quote (name . \"capture\"))' -e '(evolution-capture-message)'");
+}
+
+static void
 org_capture_mail_message_cb (GtkAction	*action,
 			     EShellView	*shell_view)
 {
@@ -91,9 +98,7 @@ org_capture_mail_message_cb (GtkAction	*action,
 				if (title == NULL || *title == '\0')
 					title = _("(No Subject)");
 
-				/* FIXME: Start the emacsclient and org-capture */
-				/* system("emacsclient -a '' -c -F '(quote (name . \"capture\"))' -e '(activate-capture-frame)'"); */
-				g_print ("   %s: %s\n", uid, title);
+				org_capture_run_emacsclient(uid, title);
 
 				g_clear_object (&info);
 				g_clear_object (&folder);
