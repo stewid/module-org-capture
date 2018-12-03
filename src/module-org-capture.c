@@ -322,46 +322,45 @@ e_org_capture_constructed (GObject *object)
 	G_OBJECT_CLASS (e_org_capture_parent_class)->constructed (object);
 
 	g_signal_connect (
-		object,
+		E_SHELL_VIEW (extensible),
 		"toggled",
-		G_CALLBACK (e_org_capture_toggled_cb),
+		G_CALLBACK (e_org_capture_shell_view_toggled_cb),
 		extension);
 }
 
 static void
 e_org_capture_finalize (GObject *object)
 {
-        /* Chain up to parent's finalize() method. */
-        G_OBJECT_CLASS (e_org_capture_parent_class)->finalize (object);
+	G_OBJECT_CLASS (e_org_capture_parent_class)->finalize (object);
+	g_hash_table_destroy (E_ORG_CAPTURE (object)->private->ui_definitions);
 }
 
 static void
 e_org_capture_class_init (EOrgCaptureClass *class)
 {
-        GObjectClass *object_class;
-        EExtensionClass *extension_class;
+	GObjectClass *object_class;
+	EExtensionClass *extension_class;
 
-        object_class = G_OBJECT_CLASS (class);
-        object_class->constructed = e_org_capture_constructed;
-        object_class->finalize = e_org_capture_finalize;
+	g_type_class_add_private (class, sizeof (EOrgCapturePrivate));
 
-        /* Specify the GType of the class we're extending.
-         * The class must implement the EExtensible interface. */
-        extension_class = E_EXTENSION_CLASS (class);
-        extension_class->extensible_type = E_TYPE_SHELL;
+	object_class = G_OBJECT_CLASS (class);
+	object_class->constructed = e_org_capture_constructed;
+	object_class->finalize = e_org_capture_finalize;
+
+	/* Set the type to extend, it's supposed to implement the EExtensible interface */
+	extension_class = E_EXTENSION_CLASS (class);
+	extension_class->extensible_type = E_TYPE_SHELL_VIEW;
 }
 
 static void
 e_org_capture_class_finalize (EOrgCaptureClass *class)
 {
-        /* This function is usually left empty. */
+        G_OBJECT_CLASS (e_org_capture_parent_class)->finalize (G_OBJECT (class));
 }
 
 static void
 e_org_capture_init (EOrgCapture *extension)
 {
-        /* The EShell object we're extending is not available yet,
-         * but we could still do some early initialization here. */
 	extension->private = G_TYPE_INSTANCE_GET_PRIVATE (
 		extension,
 		E_ORG_CAPTURE_TYPE,
@@ -374,17 +373,19 @@ e_org_capture_init (EOrgCapture *extension)
 		g_free);
 }
 
+void
+e_org_capture_type_register (GTypeModule *type_module)
+{
+	e_org_capture_register_type (type_module);
+}
+
 G_MODULE_EXPORT void
 e_module_load (GTypeModule *type_module)
 {
-        /* This registers our EShell extension class with the GObject
-         * type system.  An instance of our extension class is paired
-         * with each instance of the class we're extending. */
-        e_org_capture_register_type (type_module);
+	e_org_capture_type_register (type_module);
 }
 
 G_MODULE_EXPORT void
 e_module_unload (GTypeModule *type_module)
 {
-        /* This function is usually left empty. */
 }
