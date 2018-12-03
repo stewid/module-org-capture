@@ -241,8 +241,8 @@ org_capture_ui_definition (EShellView	 *shell_view,
 }
 
 static void
-e_org_capture_toggled_cb (EShellView	*shell_view,
-			  EOrgCapture	*org_capture)
+e_org_capture_shell_view_toggled_cb (EShellView		*shell_view,
+				     EOrgCapture	*org_capture)
 {
 	EShellViewClass *shell_view_class;
 	EShellWindow *shell_window;
@@ -296,7 +296,8 @@ e_org_capture_toggled_cb (EShellView	*shell_view,
 		org_capture->private->current_ui_id = gtk_ui_manager_add_ui_from_string (
 			ui_manager,
 			ui_def,
-			-1, &error);
+			-1,
+			&error);
 		need_update = TRUE;
 
 		if (error) {
