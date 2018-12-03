@@ -113,21 +113,6 @@ static GtkActionEntry org_menu_entries[] = {
 	  G_CALLBACK (org_capture_mail_message_cb) }
 };
 
-static gboolean
-org_capture_has_message(EMailView *mail_view)
-{
-	EMailReader	*reader	      = NULL;
-	MessageList	*message_list = NULL;
-
-	if (!E_IS_MAIL_PANED_VIEW (mail_view))
-		return FALSE;
-
-	reader	     = E_MAIL_READER (mail_view);
-	message_list = MESSAGE_LIST (e_mail_reader_get_message_list (reader));
-
-	return message_list_selected_count (message_list) == 1 ? TRUE : FALSE;
-}
-
 static void
 org_capture_enable_actions (GtkActionGroup		*action_group,
 			    const GtkActionEntry	*entries,
@@ -148,6 +133,21 @@ org_capture_enable_actions (GtkActionGroup		*action_group,
 		if (action)
 			gtk_action_set_sensitive (action, enable);
 	}
+}
+
+static gboolean
+org_capture_has_message(EMailView *mail_view)
+{
+	EMailReader	*reader	      = NULL;
+	MessageList	*message_list = NULL;
+
+	if (!E_IS_MAIL_PANED_VIEW (mail_view))
+		return FALSE;
+
+	reader	     = E_MAIL_READER (mail_view);
+	message_list = MESSAGE_LIST (e_mail_reader_get_message_list (reader));
+
+	return message_list_selected_count (message_list) == 1 ? TRUE : FALSE;
 }
 
 static void
@@ -295,7 +295,10 @@ e_org_capture_shell_view_toggled_cb (EShellView		*shell_view,
 		need_update = TRUE;
 
 		if (error) {
-			g_warning ("%s: Failed to add ui definition: %s", G_STRFUNC, error->message);
+			g_warning (
+				"%s: Failed to add ui definition: %s",
+				G_STRFUNC,
+				error->message);
 			g_error_free (error);
 		}
 	}
