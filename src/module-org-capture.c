@@ -59,20 +59,6 @@ struct _EOrgCapturePrivate {
 };
 
 G_DEFINE_DYNAMIC_TYPE (EOrgCapture, e_org_capture, E_TYPE_EXTENSION)
-G_DEFINE_DYNAMIC_TYPE (EOrgCapture, e_org_capture, E_TYPE_EXTENSION)
-
-static void
-org_capture_mail_message_cb (GtkAction	*action,
-			     EShellView	*shell_view);
-
-static GtkActionEntry org_menu_entries[] = {
-	{ "org-capture-mail-message",
-	  NULL,
-	  N_("Org capture message"),
-	  "<Primary><Alt>c",
-	  N_("Org capture message"),
-	  G_CALLBACK (org_capture_mail_message_cb) }
-};
 
 static void
 org_capture_mail_message_cb (GtkAction	*action,
@@ -117,6 +103,15 @@ org_capture_mail_message_cb (GtkAction	*action,
 		}
 	}
 }
+
+static GtkActionEntry org_menu_entries[] = {
+	{ "org-capture-mail-message",
+	  NULL,
+	  N_("Org capture message"),
+	  "<Primary><Alt>c",
+	  N_("Org capture message"),
+	  G_CALLBACK (org_capture_mail_message_cb) }
+};
 
 static gboolean
 org_capture_has_message(EMailView *mail_view)
