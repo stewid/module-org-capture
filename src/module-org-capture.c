@@ -39,27 +39,26 @@ typedef struct _EOrgCapture EOrgCapture;
 typedef struct _EOrgCaptureClass EOrgCaptureClass;
 typedef struct _EOrgCapturePrivate EOrgCapturePrivate;
 
-struct _EOrgCapture {
-        EExtension parent;
+struct _EOrgCapture
+{
+	EExtension parent;
 	EOrgCapturePrivate *private;
 };
 
-struct _EOrgCaptureClass {
-        EExtensionClass parent_class;
+struct _EOrgCaptureClass
+{
+	EExtensionClass parent;
 };
+
+GType	e_org_capture_get_type		(void);
+void	e_org_capture_type_register	(GTypeModule *type_module);
 
 struct _EOrgCapturePrivate {
 	guint current_ui_id;
 	GHashTable *ui_definitions;
 };
 
-/* Module Entry Points */
-void e_module_load (GTypeModule *type_module);
-void e_module_unload (GTypeModule *type_module);
-
-/* Forward Declarations */
-GType e_org_capture_get_type (void);
-
+G_DEFINE_DYNAMIC_TYPE (EOrgCapture, e_org_capture, E_TYPE_EXTENSION)
 G_DEFINE_DYNAMIC_TYPE (EOrgCapture, e_org_capture, E_TYPE_EXTENSION)
 
 static void
