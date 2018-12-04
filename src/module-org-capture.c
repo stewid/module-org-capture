@@ -61,10 +61,16 @@ struct _EOrgCapturePrivate {
 G_DEFINE_DYNAMIC_TYPE (EOrgCapture, e_org_capture, E_TYPE_EXTENSION)
 
 static void
-org_capture_run_emacsclient(const gchar	*uid;
+org_capture_run_emacsclient(const gchar	*uid,
 			    const gchar	*title)
 {
-	system("emacsclient -a '' -c -F '(quote (name . \"capture\"))' -e '(evolution-capture-message)'");
+	gchar *cmd;
+
+	cmd = g_strdup_printf ("emacsclient \"org-protocol://evolution-mail?uid=%s&subject=%s\"",
+			       uid,
+			       title);
+	system(cmd);
+	free(cmd);
 }
 
 static void
